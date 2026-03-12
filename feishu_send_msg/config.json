@@ -4,5 +4,6 @@
   "receive_id_type": "email",
   "receive_id": "接收者ID",
   "content": "测试消息",
-  "uuid": ""
+  "uuid": "",
+  "exit_delay": 5  // 运行完成后5秒退出，0=直接退出
 }
