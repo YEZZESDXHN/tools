@@ -1,48 +1,51 @@
 # .github/workflows/build-feishu-exe.yml
 name: Build Feishu Message EXE
 
-# 触发条件：仅手动触发（如需自动触发，可取消注释push/pr）
 on:
-  workflow_dispatch:  # 核心：支持手动运行
-  # push:
-  #   branches: [ main ]
-  # pull_request:
-  #   branches: [ main ]
+  workflow_dispatch:  # 仅手动触发
 
-# 定义作业
 jobs:
   build-windows-exe:
-    runs-on: ubuntu-latest  # 使用Ubuntu环境编译Windows程序（交叉编译）
+    runs-on: ubuntu-latest
     steps:
-      # 步骤1：检出仓库代码到Action环境
+      # 步骤1：检出代码
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 步骤2：设置Go环境（版本和go.mod保持一致）
+      # 步骤2：设置Go环境
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.21'  # Go版本，需和go.mod里的go 1.21匹配
-          cache: true  # 开启Go模块缓存，加速依赖下载
+          go-version: '1.21'
+          cache: true
 
-      # 步骤3：进入子目录，下载Go依赖（关键：feishu_send_msg是main.go所在目录）
-      - name: Download Go dependencies
-        working-directory: ./feishu_send_msg  # 切换到main.go所在子目录
-        run: go mod download
-
-      # 步骤4：交叉编译生成Windows EXE（核心步骤）
-      - name: Build Windows EXE
-        working-directory: ./feishu_send_msg  # 切换到main.go所在子目录
+      # 步骤3：进入子目录，修复依赖（核心：新增go mod tidy）
+      - name: Fix Go dependencies
+        working-directory: ./feishu_send_msg
         run: |
-          # 编译命令：生成feishu-send-msg.exe，输出到项目根目录（方便后续上传）
-          GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -ldflags="-s -w" -o ../feishu-send-msg.exe main.go
-          # 验证编译结果（可选，用于日志排查）
-          file ../feishu-send-msg.exe
+          # 关键：tidy会自动补全go.mod、生成go.sum，解决缺失问题
+          go mod tidy
+          # 下载依赖（可选，tidy已包含下载逻辑，这里加了更保险）
+          go mod download
 
-      # 步骤5：上传编译好的EXE文件（可在Action页面下载）
+      # 步骤4：编译EXE（输出到根目录）
+      - name: Build Windows EXE
+        working-directory: ./feishu_send_msg
+        run: |
+          GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -ldflags="-s -w" -o ../feishu-send-msg.exe main.go
+          # 验证编译结果
+          if [ -f ../feishu-send-msg.exe ]; then
+            echo "编译成功：EXE文件已生成"
+            file ../feishu-send-msg.exe
+          else
+            echo "编译失败：未找到EXE文件"
+            exit 1
+          fi
+
+      # 步骤5：上传产物
       - name: Upload EXE artifact
         uses: actions/upload-artifact@v4
         with:
-          name: feishu-send-msg-windows  # 产物包名
-          path: ./feishu-send-msg.exe    # EXE文件路径（输出到根目录）
-          retention-days: 30             # 产物保留30天（可选）
+          name: feishu-send-msg-windows
+          path: ./feishu-send-msg.exe
+          retention-days: 30
