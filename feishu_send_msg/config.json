@@ -1,0 +1,8 @@
+{
+  "app_id": "你的APP_ID",
+  "app_secret": "你的APP_SECRET",
+  "receive_id_type": "email",
+  "receive_id": "接收者ID",
+  "content": "测试消息",
+  "uuid": ""
+}
