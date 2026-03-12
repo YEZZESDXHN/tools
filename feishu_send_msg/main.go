@@ -146,7 +146,7 @@ func main() {
 	}
 
 	// 成功提示
-	fmt.Printf("消息发送成功！响应结果：%s\n", larkcore.Prettify(resp))
+	fmt.Printf("消息发送成功！响应结果：Code=%d, Msg=%s\n", resp.CodeError.Code, resp.CodeError.Msg)
 
 	// 7. 按参数控制退出延时（新增核心功能）
 	handleExitDelay(finalConfig.ExitDelay)
