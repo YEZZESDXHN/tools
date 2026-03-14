@@ -27,13 +27,13 @@ type Config struct {
 func main() {
 	// 1. 定义命令行参数（新增-exit-delay参数）
 	var (
-		appID         = flag.String("app-id", "", "飞书应用ID")
-		appSecret     = flag.String("app-secret", "", "飞书应用密钥")
-		receiveIdType = flag.String("receive-id-type", "", "接收ID类型")
-		receiveId     = flag.String("receive-id", "", "接收ID")
+		appID         = flag.String("app_id", "", "飞书应用ID")
+		appSecret     = flag.String("app_secret", "", "飞书应用密钥")
+		receiveIdType = flag.String("receive_id_type", "", "接收ID类型")
+		receiveId     = flag.String("receive_id", "", "接收ID")
 		content       = flag.String("content", "", "发送的文本内容")
 		uuid          = flag.String("uuid", "", "消息UUID")
-		exitDelay     = flag.Int("exit-delay", 0, "运行完成后退出延时（秒），0=直接退出") // 新增参数
+		exitDelay     = flag.Int("exit_delay", 0, "运行完成后退出延时（秒），0=直接退出") // 新增参数
 	)
 	flag.Parse()
 
